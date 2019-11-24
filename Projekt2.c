@@ -109,7 +109,57 @@ void vypisZaznam(ZAZNAM *prvyZaznam) {
 }
 
 void pridajZaznam(ZAZNAM **prvyZaznam) {
+    ZAZNAM *aktualnyZaznam, *novyZaznam;
+    int pozicia, i;
+    scanf("%d", &pozicia);
 
+    int pocetZaznamov = 0;
+    char kategoriaPonuky[50];
+    char miestoPonuky[50];
+    char ulica[100];
+    int rozloha;
+    int cena;
+    char popis[200];
+
+    //nacitanie hodnot noveho zaznamu
+    while (getchar() != '\n');
+    fgets(kategoriaPonuky, 50, stdin);
+    odstranEnter(kategoriaPonuky);
+    fgets(miestoPonuky, 50, stdin);
+    odstranEnter(miestoPonuky);
+    fgets(ulica, 100, stdin);
+    odstranEnter(ulica);
+    scanf("%d", &rozloha);
+    scanf("%d", &cena);
+    while (getchar() != '\n');
+    fgets(popis, 200, stdin);
+    odstranEnter(popis);
+
+    //zapis hodnot noveho zaznamu
+    novyZaznam = (ZAZNAM*)malloc(sizeof(ZAZNAM));
+    strcpy(novyZaznam -> kategoriaPonuky, kategoriaPonuky);
+    strcpy(novyZaznam -> miestoPonuky, miestoPonuky);
+    strcpy(novyZaznam -> ulica, ulica);
+    novyZaznam -> rozloha = rozloha;
+    novyZaznam -> cena = cena;
+    strcpy(novyZaznam -> popis, popis);
+
+    //pridanie noveho zaznamu do spajaneho zoznamu
+    if (pozicia == 1) {
+        novyZaznam -> dalsi = *prvyZaznam;
+        *prvyZaznam = novyZaznam;
+    } else {
+        aktualnyZaznam = *prvyZaznam;
+        for (i = 2; i < pozicia; i++) {
+            if (aktualnyZaznam -> dalsi != NULL) {
+                aktualnyZaznam = aktualnyZaznam -> dalsi;
+            } else {
+                break;
+            }
+        }
+        novyZaznam -> dalsi = aktualnyZaznam -> dalsi;
+        aktualnyZaznam -> dalsi = novyZaznam;
+    }
 }
 
 void zmazZaznamy(ZAZNAM **prvyZaznam) {
@@ -124,7 +174,15 @@ void aktualizujZaznamy(ZAZNAM **prvyZaznam) {
 
 }
 
-int ukoncProgram() {
+int ukoncProgram(ZAZNAM **prvyZaznam) {
+    ZAZNAM *aktualnyZaznam;
+    if (*prvyZaznam != NULL) {
+        while (aktualnyZaznam != NULL) {
+            *prvyZaznam = aktualnyZaznam -> dalsi;
+            free(aktualnyZaznam);
+            aktualnyZaznam = *prvyZaznam;
+        }
+    }
     return 0;
 }
 

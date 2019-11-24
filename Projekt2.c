@@ -163,7 +163,42 @@ void pridajZaznam(ZAZNAM **prvyZaznam) {
 }
 
 void zmazZaznamy(ZAZNAM **prvyZaznam) {
+    ZAZNAM *aktualnyZaznam, *predoslyZaznam, *odstranenyZaznam;
+    char hladaneMiesto[50];
+    char najdeneMiesto[50];
+    int i;
+    int pocetZmazanych = 0;
 
+    scanf("%s", hladaneMiesto);
+    for (i = 0; i < strlen(hladaneMiesto); i++) {
+        hladaneMiesto[i] = tolower(hladaneMiesto[i]);
+    }
+
+    aktualnyZaznam = *prvyZaznam;
+    while (aktualnyZaznam != NULL) {
+        strcpy(najdeneMiesto, aktualnyZaznam -> miestoPonuky);
+        for (i = 0; i < strlen(najdeneMiesto); i++) {
+            najdeneMiesto[i] = tolower(najdeneMiesto[i]);
+        }
+
+        if (strstr(najdeneMiesto, hladaneMiesto) != NULL) {
+            pocetZmazanych++;
+            odstranenyZaznam = aktualnyZaznam;
+            printf("Bol odstraneny zaznam s miestom: %s\n", odstranenyZaznam -> miestoPonuky);
+            if (aktualnyZaznam == *prvyZaznam) {
+                *prvyZaznam = (*prvyZaznam) -> dalsi;
+            } else {
+                predoslyZaznam -> dalsi = aktualnyZaznam -> dalsi;
+            }
+            aktualnyZaznam = aktualnyZaznam -> dalsi;
+            free(odstranenyZaznam);
+        } else {
+            predoslyZaznam = aktualnyZaznam;
+            aktualnyZaznam = aktualnyZaznam -> dalsi;
+        }
+    }
+
+    printf("Vymazalo sa %d zaznamov\n", pocetZmazanych);
 }
 
 void vyhladajZaznamy(ZAZNAM *prvyZaznam) {

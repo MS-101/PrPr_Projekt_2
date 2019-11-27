@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 typedef struct zaznam {
     char kategoriaPonuky[50];
@@ -45,7 +46,7 @@ void strLow(char *buf) {
 
 void nacitajZaznam(ZAZNAM **prvyZaznam) {
     FILE *fr;
-    ZAZNAM *aktualnyZaznam, *novyZaznam;
+    ZAZNAM *aktualnyZaznam;
     aktualnyZaznam = *prvyZaznam;
 
     if ((fr = fopen("reality.txt", "r")) == NULL) {
@@ -134,7 +135,6 @@ void pridajZaznam(ZAZNAM **prvyZaznam) {
     int pozicia, i;
     scanf("%d", &pozicia);
 
-    int pocetZaznamov = 0;
     char kategoriaPonuky[50];
     char miestoPonuky[50];
     char ulica[100];
@@ -166,13 +166,13 @@ void pridajZaznam(ZAZNAM **prvyZaznam) {
     strcpy(novyZaznam -> popis, popis);
 
     //pridanie noveho zaznamu do spajaneho zoznamu
-    if (pozicia == 1) {
+    if (pozicia == 1 || *prvyZaznam == NULL) {
         novyZaznam -> dalsi = *prvyZaznam;
         *prvyZaznam = novyZaznam;
     } else {
         aktualnyZaznam = *prvyZaznam;
         for (i = 2; i < pozicia; i++) {
-            if (aktualnyZaznam -> dalsi != NULL) {
+            if (aktualnyZaznam != NULL && aktualnyZaznam -> dalsi != NULL) {
                 aktualnyZaznam = aktualnyZaznam -> dalsi;
             } else {
                 break;

@@ -44,7 +44,7 @@ void strLow(char *buf) {
     }
 }
 
-void nacitajZaznam(ZAZNAM **prvyZaznam) {
+void nacitajZoznam(ZAZNAM **prvyZaznam) {
     FILE *fr;
     ZAZNAM *aktualnyZaznam;
     aktualnyZaznam = *prvyZaznam;
@@ -288,6 +288,133 @@ void aktualizujZaznamy(ZAZNAM **prvyZaznam) {
     printf("Aktualizovalo sa %d zaznamov\n", pocetAktualizovanych);
 }
 
+void zistiDlzkuZoznamu(ZAZNAM **prvyZaznam, int *dlzkaZoznamu) {
+    ZAZNAM *aktualnyZaznam;
+    *dlzkaZoznamu = 0;
+
+    aktualnyZaznam = *prvyZaznam;
+    while (aktualnyZaznam != NULL) {
+        (*dlzkaZoznamu)++;
+        aktualnyZaznam = aktualnyZaznam -> dalsi;
+    }
+}
+
+void usporiadajPodlaMiesta(ZAZNAM **prvyZaznam, int dlzkaZoznamu) {
+    ZAZNAM *aktualnyZaznam, *predoslyZaznam, *a, *b;
+    char bufA[50], bufB[50];
+    int i, j;
+
+    for (i = 0; i < dlzkaZoznamu - 2; i++) {
+        aktualnyZaznam = *prvyZaznam;
+        for (j = 0; j < dlzkaZoznamu - 1 - i; j++) {
+            if (aktualnyZaznam == *prvyZaznam) {
+                a = *prvyZaznam;
+                b = (*prvyZaznam) -> dalsi;
+
+                strcpy(bufA, a -> miestoPonuky);
+                strcpy(bufB, b -> miestoPonuky);
+                strLow(bufA);
+                strLow(bufB);
+
+                if (strcmp(bufA, bufB) > 0) {
+                    a -> dalsi = b -> dalsi;
+                    b -> dalsi = a;
+                    *prvyZaznam = b;
+                    predoslyZaznam = b;
+                    aktualnyZaznam = a;
+                } else {
+                    predoslyZaznam = a;
+                    aktualnyZaznam = b;
+                }
+            } else {
+                a = aktualnyZaznam;
+                b = aktualnyZaznam -> dalsi;
+
+                strcpy(bufA, a -> miestoPonuky);
+                strcpy(bufB, b -> miestoPonuky);
+                strLow(bufA);
+                strLow(bufB);
+
+                if (strcmp(bufA, bufB) > 0) {
+                    predoslyZaznam -> dalsi = b;
+                    a -> dalsi = b -> dalsi;
+                    b -> dalsi = a;
+                    predoslyZaznam = b;
+                    aktualnyZaznam = a;
+                } else {
+                    predoslyZaznam = a;
+                    aktualnyZaznam = b;
+                }
+            }
+        }
+    }
+}
+
+void usporiadajPodlaCeny(ZAZNAM **prvyZaznam, int dlzkaZoznamu) {
+    ZAZNAM *aktualnyZaznam, *predoslyZaznam, *a, *b;
+    char bufA[50], bufB[50];
+    int i, j;
+
+    for (i = 0; i < dlzkaZoznamu - 2; i++) {
+        aktualnyZaznam = *prvyZaznam;
+        for (j = 0; j < dlzkaZoznamu - 1 - i; j++) {
+            if (aktualnyZaznam == *prvyZaznam) {
+                a = *prvyZaznam;
+                b = (*prvyZaznam) -> dalsi;
+
+                strcpy(bufA, a -> miestoPonuky);
+                strcpy(bufB, b -> miestoPonuky);
+                strLow(bufA);
+                strLow(bufB);
+
+                if (strcmp(bufA, bufB) == 0 && a -> cena > b -> cena) {
+                    a -> dalsi = b -> dalsi;
+                    b -> dalsi = a;
+                    *prvyZaznam = b;
+                    predoslyZaznam = b;
+                    aktualnyZaznam = a;
+                } else {
+                    predoslyZaznam = a;
+                    aktualnyZaznam = b;
+                }
+            } else {
+                a = aktualnyZaznam;
+                b = aktualnyZaznam -> dalsi;
+
+                strcpy(bufA, a -> miestoPonuky);
+                strcpy(bufB, b -> miestoPonuky);
+                strLow(bufA);
+                strLow(bufB);
+
+                if (strcmp(bufA, bufB) == 0 && a -> cena > b -> cena) {
+                    predoslyZaznam -> dalsi = b;
+                    a -> dalsi = b -> dalsi;
+                    b -> dalsi = a;
+                    predoslyZaznam = b;
+                    aktualnyZaznam = a;
+                } else {
+                    predoslyZaznam = a;
+                    aktualnyZaznam = b;
+                }
+            }
+        }
+    }
+}
+
+void usporiadajZoznam(ZAZNAM **prvyZaznam) {
+    if (*prvyZaznam == NULL) {
+        printf("Zoznam nie je mozne usporiadat\n");
+    } else {
+        int dlzkaZoznamu;
+        zistiDlzkuZoznamu(prvyZaznam, &dlzkaZoznamu);
+
+        usporiadajPodlaMiesta(prvyZaznam, dlzkaZoznamu);
+        usporiadajPodlaCeny(prvyZaznam, dlzkaZoznamu);
+
+        printf("Zaznamy boli usporiadane\n");
+    }
+}
+
 int koniecProgramu(ZAZNAM **prvyZaznam) {
     vymazZoznam(&prvyZaznam);
     return 0;
@@ -298,7 +425,7 @@ int main() {
     while (1)  {
         switch (getchar()) {
             case 'n':
-                nacitajZaznam(&prvyZaznam);
+                nacitajZoznam(&prvyZaznam);
                 break;
             case 'v':
                 vypisZoznam(prvyZaznam);
@@ -314,6 +441,9 @@ int main() {
                 break;
             case 'a':
                 aktualizujZaznamy(&prvyZaznam); //podla miesta ponuky
+                break;
+            case 'u':
+                usporiadajZoznam(&prvyZaznam);
                 break;
             case 'k':
                 return koniecProgramu(&prvyZaznam);
